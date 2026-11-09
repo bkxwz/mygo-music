@@ -43,10 +43,6 @@ jobs:
           gh release view tablet-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||
             gh release create tablet-latest --repo "$GITHUB_REPOSITORY" --prerelease \
               --title "平板版（Ubuntu 22.04）" \
-              --notes "为 1200×800 八寸平板做的老人触屏版：界面整体放大（设置 → 通用 → 界面大小可调）。
-
-- x86 平板装 [deb](#)（文件名含 amd64）：wget 后 sudo apt install ./mygo-music_*.deb
-- 或解开 tar.gz（文件名含 linux-amd64），运行其中的 install.sh，装到 ~/.local
-- 不确定架构先在平板上执行 uname -m：x86_64 用 amd64，aarch64 用 arm64"
+              --notes "为 1200×800 八寸平板做的老人触屏版：界面整体放大，设置 → 通用 → 界面大小可调。x86 平板装文件名含 amd64 的 .deb 或 tar.gz；arm 平板用 arm64。"
           gh release upload tablet-latest --repo "$GITHUB_REPOSITORY" --clobber \
             build/linux-${{ matrix.arch }}/*.deb build/linux-${{ matrix.arch }}/*.tar.gz
