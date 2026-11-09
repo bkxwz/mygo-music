@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/plugins/glass"
 	"github.com/egoist/mygo/ui"
 
@@ -378,6 +379,16 @@ func (a *app) pageTop(c *ui.Context) {
 			}
 			if len(a.forward) > 0 && iconButton(c.Key("forward"), iconForward, 18, a.pal.muted, T("Forward")).Clicked() {
 				a.goForward()
+			}
+		})
+	}
+	// Where the system shows no buttons of its own, as on the tablet's
+	// GNOME, the app closes itself from here: the process ends, for the
+	// window has no tray to hide to.
+	if runtime.GOOS == "linux" && c.TitleBar().Right == 0 {
+		ui.Row(c).Absolute().Top(0).Right(20).Height(topBar(c)).AlignItems(ui.Center).Children(func() {
+			if iconButton(c.Key("quit"), iconX, 18, a.pal.muted, T("Close")).Clicked() {
+				mygo.App.Quit()
 			}
 		})
 	}

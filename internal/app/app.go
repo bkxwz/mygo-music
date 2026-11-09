@@ -374,6 +374,13 @@ func Run() error {
 			Content:              ui.View(a.view),
 		})
 		a.setMenu()
+		// The tablet's GNOME gives a window less room than its size asks
+		// for, the dock and the top bar taking their share, and a window of
+		// the screen's size would hide its right and its foot behind them:
+		// full it, which fits it to the work area wherever it opens.
+		if runtime.GOOS == "linux" {
+			a.win.Maximize()
+		}
 		a.boot()
 		// The notch player is macOS's, over its menu bar: elsewhere it would
 		// hang at the top of the screen as a black box.
