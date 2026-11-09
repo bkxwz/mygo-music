@@ -4,3 +4,5 @@ mygo_windows_*.syso
 /mygo-music
 /node_modules/
 /shots/
+/mygo-music-*.tar.gz
+/mygo-music_*.deb
