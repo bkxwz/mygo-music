@@ -83,12 +83,21 @@ type settings struct {
 	CacheMB int `json:"cacheMB"`
 	// SearchHistory keeps submitted keywords, most recent first.
 	SearchHistory []string `json:"searchHistory,omitempty"`
+	// Scale is how much bigger the whole interface shows, for a screen
+	// held in the hands, as a tablet's is: text, icons and buttons alike
+	// grow by it, as a browser zooms a page. 0, in settings written before
+	// it was a choice, is defaultScale.
+	Scale float64 `json:"scale"`
 
 	path string // where they were loaded from, and are saved to
 }
 
+// defaultScale is the zoom a settings without one takes: big enough that
+// a hand can tap what an eye can read.
+const defaultScale = 1.6
+
 func defaultSettings() settings {
-	return settings{Language: i18n.System, NotchActivity: true, Quality: "high", Appearance: "system", Volume: 0.8, Normalize: true, AppIcon: "dock-and-menubar", CacheMB: 2048}
+	return settings{Language: i18n.System, NotchActivity: true, Quality: "high", Appearance: "system", Volume: 0.8, Normalize: true, AppIcon: "dock-and-menubar", CacheMB: 2048, Scale: defaultScale}
 }
 
 func settingsPath() (string, error) {
@@ -149,6 +158,27 @@ var qualityLevels = []struct{ level, label string }{
 	{"standard", N("Standard")},
 	{"high", N("High")},
 	{"lossless", N("Lossless")},
+}
+
+// zoomLevels are the sizes the interface can show at, by their labels.
+var zoomLevels = []struct {
+	zoom  float64
+	label string
+}{
+	{1.0, N("Standard")},
+	{1.4, N("Large")},
+	{1.6, N("Extra Large")},
+	{2.0, N("Largest")},
+}
+
+// zoom is the zoom the views show at, as Context.SetZoom takes it: what
+// the settings say, or the default where they say nothing yet.
+func (s settings) zoom() float32 {
+	z := s.Scale
+	if z <= 0 {
+		z = defaultScale
+	}
+	return float32(min(2.5, max(0.75, z)))
 }
 
 // cacheLimits are the sizes the song cache may take, in megabytes.

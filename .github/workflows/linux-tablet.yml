@@ -1,0 +1,52 @@
+# Builds the Linux app of this fork for the tablet, on every push to main
+# and by hand. The .deb and the .tar.gz (which carries the executable, its
+# resources and an install.sh) land both on the run's artifacts and on a
+# rolling prerelease named tablet-latest, where the tablet takes them from.
+# Not `v*`-tagged, so the upstream release workflow stays out of the way.
+name: Linux Tablet Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore: ["**.md", "website/**", "examples/**"]
+
+permissions:
+  contents: write # the tablet-latest release and its assets
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@v7
+      # mygo build evaluates mygo.config.ts with Bun.
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Build linux/${{ matrix.arch }}
+        run: go tool mygo build -platform linux/${{ matrix.arch }}
+      - name: Upload the build as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mygo-music-linux-${{ matrix.arch }}
+          path: build/linux-${{ matrix.arch }}/
+      - name: Attach the .deb and the .tar.gz to the tablet-latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view tablet-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||
+            gh release create tablet-latest --repo "$GITHUB_REPOSITORY" --prerelease \
+              --title "平板版（Ubuntu 22.04）" \
+              --notes "为 1200×800 八寸平板做的老人触屏版：界面整体放大（设置 → 通用 → 界面大小可调）。
+
+- x86 平板装 [deb](#)（文件名含 amd64）：wget 后 sudo apt install ./mygo-music_*.deb
+- 或解开 tar.gz（文件名含 linux-amd64），运行其中的 install.sh，装到 ~/.local
+- 不确定架构先在平板上执行 uname -m：x86_64 用 amd64，aarch64 用 arm64"
+          gh release upload tablet-latest --repo "$GITHUB_REPOSITORY" --clobber \
+            build/linux-${{ matrix.arch }}/*.deb build/linux-${{ matrix.arch }}/*.tar.gz

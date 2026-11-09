@@ -31,10 +31,10 @@ func (a *app) openSettings() {
 	a.measureCache()
 	a.settingsWin = mygo.NewWindow(mygo.WindowOptions{
 		Title:     T("Settings"),
-		Width:     780,
-		Height:    640,
-		MinWidth:  640,
-		MinHeight: 420,
+		Width:     900,
+		Height:    720,
+		MinWidth:  700,
+		MinHeight: 480,
 		// Its sidebar reaches up under the window buttons, as the main window's does.
 		TitleBarStyle:        mygo.TitleBarHidden,
 		TitleBarHeight:       buttonsHeight,
@@ -145,6 +145,11 @@ func settingsMatch(query string, texts ...string) bool {
 }
 
 func (a *app) settingsView(c *ui.Context) {
+	// As big as the main window shows, so that the two agree.
+	if z := a.settings.zoom(); z != 1 {
+		c.SetZoom(z)
+	}
+	c.SetMenuPresentation(ui.PopoverMenus)
 	t := *c.Theme()
 	p := paletteFor(&t)
 	useAccent(&t, p)
@@ -351,6 +356,24 @@ func (a *app) settingsSections(c *ui.Context, p palette) []settingsSection {
 			}
 			if segmented(c.Key("appearance"), &i, T("System"), T("Light"), T("Dark")) {
 				s.Appearance = modes[i]
+				a.changed()
+			}
+		})
+		row(T("Interface Size"), T("How big everything shows, for a screen held in the hands"), func() {
+			scale := s.Scale
+			if scale <= 0 {
+				scale = defaultScale
+			}
+			labels := make([]string, len(zoomLevels))
+			at := 0
+			for i, l := range zoomLevels {
+				labels[i] = T(l.label)
+				if l.zoom == scale {
+					at = i
+				}
+			}
+			if i, ok := choice(c, "ui-scale", T("Interface Size"), labels, at); ok {
+				s.Scale = zoomLevels[i].zoom
 				a.changed()
 			}
 		})

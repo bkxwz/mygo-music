@@ -357,10 +357,11 @@ func Run() error {
 		a.pl.SetVolume(a.volume)
 		a.win = mygo.NewWindow(mygo.WindowOptions{
 			Title:         mygo.App.Name(),
-			Width:         1180,
-			Height:        780,
-			MinWidth:      880,
-			MinHeight:     580,
+			// As a tablet's screen, where the big interface lives.
+			Width:         1200,
+			Height:        800,
+			MinWidth:      960,
+			MinHeight:     640,
 			StateKey:      "main",
 			TitleBarStyle: mygo.TitleBarHidden,
 			// As tall as the edge over a page (Linux, Windows).

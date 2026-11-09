@@ -13,6 +13,15 @@ import (
 const sidebarWidth = 232
 
 func (a *app) view(c *ui.Context) {
+	// Everything a hand taps and an eye reads — text, icons, buttons,
+	// menus — shows so many times bigger, and stays as sharp, as a
+	// browser's zoom of a page.
+	if z := a.settings.zoom(); z != 1 {
+		c.SetZoom(z)
+	}
+	// The menus draw in the window, at the zoom's size, rather than the
+	// system's, which stays small under a finger.
+	c.SetMenuPresentation(ui.PopoverMenus)
 	t := *c.Theme()
 	a.pal = paletteFor(&t)
 	p := a.pal

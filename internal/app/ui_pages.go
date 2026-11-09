@@ -524,12 +524,18 @@ func (a *app) trackRow(c *ui.Context, tracks []music.Track, i int, covers bool, 
 				}
 			})
 		}
-		// A liked song's heart shows; the others' as the pointer is on them.
+		// The heart shows for good: a finger never hovers, and liking a
+		// song is what the heart is there for.
 		ui.Box(c).Size(32, 32).Center().Children(func() {
-			if a.isLiked(tr) || hovered {
+			if a.isLiked(tr) || hovered || a.settings.zoom() > 1 {
 				a.likeButton(c.Key("like"), tr, 15, p.muted)
 			}
 		})
+		// Where the interface is big, as on a tablet, the menu of the song
+		// shows behind dots of its own, beside where right clicks are.
+		if a.settings.zoom() > 1 {
+			iconButton(c.Key("more"), iconMore, 13, p.muted, T("More")).Menu(a.songItems(tr, pid))
+		}
 		ui.Text(c, clock(tr.Length())).FontSize(12.5).FontFeatures("tnum").TextColor(p.faint).Width(44).TextAlign(ui.End)
 	})
 	if row.Clicked() && !tr.Unavailable {

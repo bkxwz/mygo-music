@@ -64,11 +64,9 @@ func (a *app) scrubber(c *ui.Context, st *scrubState, track, fill ui.Color, heig
 		thick = 6
 	}
 	thick = s.AnimateTo("thick", thick, ui.Snappy)
-	knob := float32(0)
-	if hot {
-		knob = 1
-	}
-	knob = s.AnimateTo("knob", knob, ui.Snappy)
+	// The knob shows for good: a finger never hovers, and where the song
+	// is should be plain to see before it is touched.
+	knob := s.AnimateTo("knob", float32(1), ui.Snappy)
 	// The smoke settles away as the music pauses, and while dragging.
 	smoking := float32(0)
 	if smoke.A > 0 && a.settings.Smoke && pl.Playing() && !pl.Loading() && !st.active {
@@ -420,7 +418,9 @@ func (a *app) playerBar(c *ui.Context) {
 			a.transport(c, p.text, p.muted, p.accent, 18)
 			ui.Row(c).Gap(10).AlignItems(ui.Center).Margin(-4, 0, 0, 0).Children(func() {
 				ui.Text(c, clock(pl.Position())).FontSize(10.5).FontFeatures("tnum").TextColor(p.faint).Width(34).TextAlign(ui.End)
-				a.scrubber(c.Key("bar-scrub"), &a.barScrub, p.press, p.text.Alpha(0.75), 14, p.accent).Grow(1)
+				// Taller than it looks: the bar is drawn thin at its middle,
+				// and the rest of it is room for a finger to take hold.
+				a.scrubber(c.Key("bar-scrub"), &a.barScrub, p.press, p.text.Alpha(0.75), 26, p.accent).Grow(1)
 				ui.Text(c, clock(pl.Duration())).FontSize(10.5).FontFeatures("tnum").TextColor(p.faint).Width(34)
 			})
 		})

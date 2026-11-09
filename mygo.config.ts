@@ -8,10 +8,8 @@ export default ({ command }: { command: string }) => ({
   version: "0.1.22",
   out: "build",
   urlSchemes: [command === "dev" ? "mygo-music-dev" : "mygo-music"],
-  updates: {
-    publicKey: "WzJsOGNIuf6mcEqo5ff8jub+NoQQOEk4JXreLPYjgyQ=",
-    github: "egoist/mygo-music",
-  },
+  // No updates block: this fork must not update itself from the upstream
+  // releases, which would replace its big, touch-first interface.
   macos: {
     icon: "icon/AppIcon.icon",
     minimumSystemVersion: "13.0",

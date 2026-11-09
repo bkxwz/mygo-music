@@ -365,6 +365,9 @@ func addFake(a *app, src music.Source) *library {
 // newTestApp is an app with one source, a fakeSource called "fake": see fake.
 func newTestApp() *app {
 	a := &app{signInOver: new(atomic.Pointer[mygo.Window]), settings: defaultSettings(), settingText: map[string]*string{}, lyricAt: -1, queueAt: -1}
+	// The views build as designed here: how much bigger the interface
+	// shows is a matter of the screen it shows on, which a test hasn't.
+	a.settings.Scale = 1
 	a.library = addFake(a, newFakeSource("fake"))
 	a.route = route{page: pageHome, src: "fake"}
 	a.art = newArtCache(func(func()) {})
